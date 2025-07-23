@@ -2,6 +2,7 @@
 using APICatalogo.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers
 {
@@ -21,7 +22,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("{id:int}", Name="ObterProduto")]
-        public ActionResult<Produto> GetById(int id)
+        public ActionResult<Produto> Get(int id)
         {
             var produto = _context.Produtos.SingleOrDefault(p => p.Id == id);
             if (produto is null)
@@ -40,6 +41,23 @@ namespace APICatalogo.Controllers
 
             return new CreatedAtRouteResult("ObterProduto",
                 new { id = produto.Id }, produto);
+        }
+
+        [HttpPut("{id:int}")]
+        public ActionResult Put(int id, Produto produto)
+        {
+            if (id != produto.Id)
+                return BadRequest("Há divergência nos IDs informados!");
+
+            var produtoExistente = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.Id == id);
+
+            if (produtoExistente is null)
+                return NotFound($"Produto de Id {id} não encontrado!");
+
+            _context.Entry(produto).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return Ok(produto);
         }
     }
 }
