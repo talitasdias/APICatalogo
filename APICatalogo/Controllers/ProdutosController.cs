@@ -59,5 +59,19 @@ namespace APICatalogo.Controllers
 
             return Ok(produto);
         }
+
+        [HttpDelete("{id:int}")]
+        public ActionResult Delete(int id)
+        {
+            var produto = _context.Produtos.SingleOrDefault(p => p.Id == id);
+            if (produto is null)
+                return NotFound($"Produto de id {id} não encontrado!");
+
+            //_context.Entry(produto).State = EntityState.Deleted;
+            _context.Produtos.Remove(produto);
+            _context.SaveChanges();
+
+            return Ok("Produto deletado com sucesso!");
+        }
     }
 }
