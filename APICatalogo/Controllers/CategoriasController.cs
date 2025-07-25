@@ -42,7 +42,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Categoria categoria)
+        public ActionResult<Categoria> Put(int id, Categoria categoria)
         {
             if (id != categoria.Id)
                 return BadRequest("Há divergência nos Ids informados!");
@@ -52,6 +52,19 @@ namespace APICatalogo.Controllers
                 return NotFound($"Categoria de id {id} não encontrado!");
 
             _context.Entry(categoria).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return Ok(categoria);
+        }
+
+        [HttpDelete("{id:int}")]
+        public ActionResult<Categoria> Delete(int id)
+        {
+            var categoria = _context.Categorias.SingleOrDefault(c => c.Id == id);
+            if (categoria is null)
+                return NotFound($"Categoria de id {id} não encontrado!");
+
+            _context.Remove(categoria);
             _context.SaveChanges();
 
             return Ok(categoria);
