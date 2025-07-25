@@ -40,5 +40,21 @@ namespace APICatalogo.Controllers
             return new CreatedAtRouteResult("ObterCategoria",
                 new {id = categoria.Id}, categoria);
         }
+
+        [HttpPut("{id:int}")]
+        public ActionResult Put(int id, Categoria categoria)
+        {
+            if (id != categoria.Id)
+                return BadRequest("Há divergência nos Ids informados!");
+
+            var categoriaExistente = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.Id == id);
+            if (categoriaExistente is null)
+                return NotFound($"Categoria de id {id} não encontrado!");
+
+            _context.Entry(categoria).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return Ok(categoria);
+        }
     }
 }
