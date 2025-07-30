@@ -49,7 +49,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post(Produto produto)
+        public ActionResult<Produto> Post(Produto produto)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Produto produto)
+        public ActionResult<Produto> Put(int id, Produto produto)
         {
             try
             {
