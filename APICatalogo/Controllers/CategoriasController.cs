@@ -17,7 +17,7 @@ namespace APICatalogo.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            var categorias = _repository.GetCategorias();
+            var categorias = _repository.GetCategoriasProdutos();
             return Ok(categorias);
         }
 

@@ -14,6 +14,11 @@ public class CategoriaRepository(AppDbContext context) : ICategoriaRepository
         return _context.Categorias?.AsNoTracking().ToList();
     }
 
+    public IEnumerable<Categoria> GetCategoriasProdutos()
+    {
+        return _context.Categorias?.AsNoTracking().Include(c => c.Produtos).ToList();
+    }
+
     public Categoria? GetCategoria(int id)
     {
         return _context.Categorias?.AsNoTracking().SingleOrDefault(c => c.Id == id);
