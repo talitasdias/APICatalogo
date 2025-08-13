@@ -11,12 +11,12 @@ public class CategoriaRepository(AppDbContext context) : ICategoriaRepository
 
     public IEnumerable<Categoria> GetCategorias()
     {
-        return _context.Categorias?.AsNoTracking().ToList();
+        return _context.Categorias?.AsNoTracking().ToList() ?? new List<Categoria>();
     }
 
     public IEnumerable<Categoria> GetCategoriasProdutos()
     {
-        return _context.Categorias?.AsNoTracking().Include(c => c.Produtos).ToList();
+        return _context.Categorias?.AsNoTracking().Include(c => c.Produtos).ToList() ?? new List<Categoria>();
     }
 
     public Categoria? GetCategoria(int id)
