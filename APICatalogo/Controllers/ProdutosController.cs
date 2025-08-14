@@ -1,21 +1,30 @@
 ﻿using APICatalogo.Models;
 using APICatalogo.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ProdutosController(IProdutoRepository repository) : ControllerBase
+    public class ProdutosController(IRepository<Produto> repository, IProdutoRepository produtoRepository) : ControllerBase
     {
-        private readonly IProdutoRepository _repository = repository;
+        private readonly IRepository<Produto> _repository = repository;
+        private readonly IProdutoRepository _produtoRepository = produtoRepository;
+
+        [HttpGet("produtos/{id}")]
+        public ActionResult<IEnumerable<Produto>> GetProdutosCategoria(int id)
+        {
+            var produtos = _produtoRepository.GetProdutosPorIdCategoria(id);
+            
+            if (produtos is null)
+                return NotFound();
+            return Ok(produtos);
+        }
 
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _repository.GetProdutos().ToList();
+            var produtos = _repository.GetAll();
             if (produtos is null)
                 return NotFound("Produtos não encontrados!");
             return Ok(produtos);
@@ -24,7 +33,7 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int:min(1)}", Name="ObterProduto")]
         public ActionResult<Produto> Get(int id)
         {
-            var produto = _repository.GetProduto(id);
+            var produto = _repository.Get(p => p.Id == id);
             if (produto is null)
                 return NotFound($"Produto de Id {id} não encontrado!");
             return produto;
@@ -51,22 +60,25 @@ namespace APICatalogo.Controllers
             if (id != produto.Id)
                 return BadRequest("Há divergência nos IDs informados!");
 
-            var atualizado = _repository.Update(produto);
+            var produtoExiste = _repository.Get(p => p.Id == id);
 
-            if (!atualizado)
+            if (produtoExiste is null)
                 return NotFound($"Produto de id {id} não encontrado!");
 
-            return Ok(produto);         
+            var produtoAtualizado = _repository.Update(produto);
+
+            return Ok(produtoAtualizado);         
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var deletado = _repository.Delete(id);
-            
-            if (!deletado)
+            var produto = _repository.Get(p => p.Id == id);
+            if (produto is null)
                 return NotFound($"Produto de id {id} não encontrado!");
 
+            var produtoDeletado = _repository.Delete(produto);
+            
             return Ok("Produto deletado com sucesso!");            
         }
     }
