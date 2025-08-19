@@ -1,4 +1,5 @@
 ﻿using APICatalogo.DTOs;
+using APICatalogo.DTOs.Mappings;
 using APICatalogo.Filters;
 using APICatalogo.Models;
 using APICatalogo.Repositories;
@@ -18,12 +19,10 @@ namespace APICatalogo.Controllers
         {
             var categorias = _uof.CategoriaRepository.GetAll();
 
-            var categoriasDto = categorias.Select(c => new CategoriaDTO
-            {
-                Id = c.Id,
-                Nome = c.Nome,
-                ImagemUrl = c.ImagemUrl
-            });
+            if (!categorias.Any())
+                return Ok(new List<CategoriaDTO>());
+
+            var categoriasDto = categorias.ToCategoriaDTOList();
 
             return Ok(categoriasDto);
         }
@@ -35,12 +34,7 @@ namespace APICatalogo.Controllers
             if (categoria is null)
                 return NotFound($"Categoria de id {id} não encontrado!");
 
-            var categoriaDto = new CategoriaDTO
-            {
-                Id = categoria.Id,
-                Nome = categoria.Nome,
-                ImagemUrl = categoria.ImagemUrl
-            };
+            var categoriaDto = categoria.ToCategoriaDTO();
 
             return Ok(categoriaDto);
         }
@@ -48,12 +42,14 @@ namespace APICatalogo.Controllers
         [HttpPost]
         public ActionResult<CategoriaDTO> Post(CategoriaDTO categoriaDto)
         {
-            var categoria = new Categoria { Nome = categoriaDto.Nome, ImagemUrl = categoriaDto.ImagemUrl };
+            if (categoriaDto is null) return BadRequest();
+
+            var categoria = categoriaDto.ToCategoria();
 
             var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
             _uof.Commit();
 
-            var novaCategoriaDto = new Categoria { Id = categoriaCriada.Id, Nome = categoriaCriada.Nome, ImagemUrl = categoriaCriada.ImagemUrl };
+            var novaCategoriaDto = categoriaCriada.ToCategoriaDTO();
 
             return new CreatedAtRouteResult("ObterCategoria",
                 new { id = novaCategoriaDto.Id }, novaCategoriaDto);            
@@ -73,12 +69,12 @@ namespace APICatalogo.Controllers
             if (categoriaExiste is null)
                 return NotFound($"Categoria de id {id} não encontrado!");
 
-            var categoria = new Categoria { Id = categoriaDto.Id, Nome = categoriaDto.Nome, ImagemUrl = categoriaDto.ImagemUrl };
+            var categoria = categoriaDto.ToCategoria();
 
             var categoriaAtualizada = _uof.CategoriaRepository.Update(categoria);
             _uof.Commit();
 
-            var categoriaAtualizadaDto = new CategoriaDTO { Id = categoriaAtualizada.Id, Nome = categoriaAtualizada.Nome, ImagemUrl = categoriaAtualizada.ImagemUrl };
+            var categoriaAtualizadaDto = categoriaAtualizada.ToCategoriaDTO();
 
             return Ok(categoriaAtualizadaDto);                
         }
@@ -93,7 +89,7 @@ namespace APICatalogo.Controllers
             var categoriaExcluida = _uof.CategoriaRepository.Delete(categoria);
             _uof.Commit();
 
-            var categoriaExcluidaDto = new CategoriaDTO { Id = categoriaExcluida.Id, Nome = categoriaExcluida.Nome, ImagemUrl = categoriaExcluida.ImagemUrl };
+            var categoriaExcluidaDto = categoriaExcluida.ToCategoriaDTO();
             
             return Ok(categoriaExcluidaDto);
         }
