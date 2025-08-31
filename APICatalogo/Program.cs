@@ -24,7 +24,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-string mySQLConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+string mySQLConnection = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(mySQLConnection, ServerVersion.AutoDetect(mySQLConnection)));
 
