@@ -13,4 +13,14 @@ public class CategoriaRepository(AppDbContext context) : Repository<Categoria>(c
         var categoriasOrdenados = PagedList<Categoria>.ToPagedList(categorias, categoriasParams.PageNumber, categoriasParams.PageSize);
         return categoriasOrdenados;
     }
+
+    public PagedList<Categoria> GetCategoriasFiltroNome(CategoriasFiltroNome catFiltroNome)
+    {
+        var categorias = GetAll().AsQueryable();
+        if (!string.IsNullOrEmpty(catFiltroNome.Nome))
+            categorias = categorias.Where(c => c.Nome.Contains(catFiltroNome.Nome, StringComparison.InvariantCultureIgnoreCase));
+
+        var categoriasOrdenados = PagedList<Categoria>.ToPagedList(categorias, catFiltroNome.PageNumber, catFiltroNome.PageSize);
+        return categoriasOrdenados;
+    }
 }
