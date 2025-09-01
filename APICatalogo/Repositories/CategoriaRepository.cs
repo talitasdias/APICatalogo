@@ -18,7 +18,7 @@ public class CategoriaRepository(AppDbContext context) : Repository<Categoria>(c
     {
         var categorias = GetAll().AsQueryable();
         if (!string.IsNullOrEmpty(catFiltroNome.Nome))
-            categorias = categorias.Where(c => c.Nome.Contains(catFiltroNome.Nome, StringComparison.InvariantCultureIgnoreCase));
+            categorias = categorias.Where(c => c.Nome != null && c.Nome.Contains(catFiltroNome.Nome, StringComparison.InvariantCultureIgnoreCase));
 
         var categoriasOrdenados = PagedList<Categoria>.ToPagedList(categorias, catFiltroNome.PageNumber, catFiltroNome.PageSize);
         return categoriasOrdenados;
