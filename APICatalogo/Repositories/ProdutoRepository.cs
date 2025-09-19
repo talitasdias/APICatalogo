@@ -1,19 +1,21 @@
 using APICatalogo.Context;
 using APICatalogo.Models;
 using APICatalogo.Pagination;
+using X.PagedList;
 
 namespace APICatalogo.Repositories;
 
 public class ProdutoRepository(AppDbContext context) : Repository<Produto>(context), IProdutoRepository
 {
-    public async Task<PagedList<Produto>> GetProdutosAsync(ProdutosParameters produtosParams)
+    public async Task<IPagedList<Produto>> GetProdutosAsync(ProdutosParameters produtosParams)
     {
         var produtos = (await GetAllAsync()).OrderBy(p => p.Id).AsQueryable();
-        var produtosOrdenados = PagedList<Produto>.ToPagedList(produtos, produtosParams.PageNumber, produtosParams.PageSize);
+        //var produtosOrdenados = PagedList<Produto>.ToPagedList(produtos, produtosParams.PageNumber, produtosParams.PageSize);
+        var produtosOrdenados = await produtos.ToPagedListAsync(produtosParams.PageNumber, produtosParams.PageSize);
         return produtosOrdenados;
     }
 
-    public async Task<PagedList<Produto>> GetProdutosFiltroPrecoAsync(ProdutosFiltroPreco prodFiltroPreco)
+    public async Task<IPagedList<Produto>> GetProdutosFiltroPrecoAsync(ProdutosFiltroPreco prodFiltroPreco)
     {
         var produtos = (await GetAllAsync()).AsQueryable();
         if (prodFiltroPreco.Preco.HasValue && !string.IsNullOrEmpty(prodFiltroPreco.PrecoCriterio))
@@ -26,8 +28,8 @@ public class ProdutoRepository(AppDbContext context) : Repository<Produto>(conte
                 produtos = produtos.Where(p => p.Preco == prodFiltroPreco.Preco).OrderBy(p => p.Preco);
         }
 
-        var produtosFiltrados = PagedList<Produto>.ToPagedList(produtos, prodFiltroPreco.PageNumber, prodFiltroPreco.PageSize);
-
+        //var produtosFiltrados = PagedList<Produto>.ToPagedList(produtos, prodFiltroPreco.PageNumber, prodFiltroPreco.PageSize);
+        var produtosFiltrados = await produtos.ToPagedListAsync(prodFiltroPreco.PageNumber, prodFiltroPreco.PageSize);
         return produtosFiltrados;
     }
 
