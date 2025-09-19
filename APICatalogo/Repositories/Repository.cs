@@ -8,14 +8,14 @@ public class Repository<T>(AppDbContext context) : IRepository<T> where T : clas
 {
     protected readonly AppDbContext _context = context;
 
-    public IEnumerable<T> GetAll()
+    public async Task<IEnumerable<T>> GetAllAsync()
     {
-        return _context.Set<T>().AsNoTracking().ToList();
+        return await _context.Set<T>().AsNoTracking().ToListAsync();
     }
 
-    public T? Get(Expression<Func<T, bool>> predicate)
+    public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate)
     {
-        return _context.Set<T>().AsNoTracking().SingleOrDefault(predicate);
+        return await _context.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate);
     }
 
     public T Create(T entity)
