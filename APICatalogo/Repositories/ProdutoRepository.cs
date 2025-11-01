@@ -1,6 +1,7 @@
 using APICatalogo.Context;
 using APICatalogo.Models;
 using APICatalogo.Pagination;
+using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
 namespace APICatalogo.Repositories;
@@ -10,6 +11,7 @@ public class ProdutoRepository(AppDbContext context) : Repository<Produto>(conte
     public async Task<IPagedList<Produto>> GetProdutosAsync(ProdutosParameters produtosParams)
     {
         var produtos = (await GetAllAsync()).OrderBy(p => p.Id).AsQueryable();
+        //var query = _context?.Produtos?.AsNoTracking().OrderBy(p => p.Id);
         //var produtosOrdenados = PagedList<Produto>.ToPagedList(produtos, produtosParams.PageNumber, produtosParams.PageSize);
         var produtosOrdenados = await produtos.ToPagedListAsync(produtosParams.PageNumber, produtosParams.PageSize);
         return produtosOrdenados;
